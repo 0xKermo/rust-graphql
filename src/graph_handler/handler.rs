@@ -1,7 +1,7 @@
 use crate::{
     config::mongo::DBMongo,
     graph_schemas::schemas::{
-        FetchEvent,CollectionInfo,Events,Erc721,FetchErc721,FetchCollection
+        FetchEvent,CollectionInfo,Events,Erc721,FetchErc721,FetchCollection, Pagination
     },
 };
 use async_graphql::{Context, EmptySubscription, FieldResult, Object, Schema};
@@ -11,9 +11,9 @@ pub struct Query;
 #[Object(extends)]
 impl Query {
     //collection query
-    async fn get_collections(&self, ctx: &Context<'_>) -> FieldResult<Vec<CollectionInfo>> {
+    async fn get_collections(&self, ctx: &Context<'_>,limit_input:Pagination) -> FieldResult<Vec<CollectionInfo>> {
         let db = &ctx.data_unchecked::<DBMongo>();
-        let collections = db.get_collections().await.unwrap();
+        let collections = db.get_collections(limit_input).await.unwrap();
         Ok(collections)
     }
     
@@ -25,34 +25,34 @@ impl Query {
     }
 
     // event query
-    async fn get_events(&self, ctx: &Context<'_>) -> FieldResult<Vec<Events>> {
+    async fn get_events(&self, ctx: &Context<'_>,limit_input:Pagination) -> FieldResult<Vec<Events>> {
         let db = &ctx.data_unchecked::<DBMongo>();
-        let events = db.get_events().await.unwrap();
+        let events = db.get_events(limit_input).await.unwrap();
         Ok(events)
     }
     
-    async fn get_collection_events(&self, ctx: &Context<'_>,input:FetchEvent) -> FieldResult<Vec<Events>> {
+    async fn get_collection_events(&self, ctx: &Context<'_>,input:FetchEvent, limit_input:Pagination) -> FieldResult<Vec<Events>> {
         let db = &ctx.data_unchecked::<DBMongo>();
         let collection_events = db.get_collection_events(
-            &input.contract_address.unwrap()).await.unwrap();
+            &input.contract_address.unwrap(), limit_input).await.unwrap();
         Ok(collection_events)
     }
 
-    async fn get_user_events(&self, ctx: &Context<'_>,input:FetchEvent) -> FieldResult<Vec<Events>> {
+    async fn get_user_events(&self, ctx: &Context<'_>,input:FetchEvent, limit_input:Pagination) -> FieldResult<Vec<Events>> {
         let db = &ctx.data_unchecked::<DBMongo>();
-        let tokens = db.get_user_events(input.owner.unwrap()).await.unwrap();
+        let tokens = db.get_user_events(input.owner.unwrap(), limit_input).await.unwrap();
         Ok(tokens)
     }
 
-    async fn get_token_events(&self, ctx: &Context<'_>,input:FetchEvent) -> FieldResult<Vec<Events>> {
+    async fn get_token_events(&self, ctx: &Context<'_>,input:FetchEvent, limit_input:Pagination) -> FieldResult<Vec<Events>> {
         let db = &ctx.data_unchecked::<DBMongo>();
-        let tokens = db.get_token_events(input).await.unwrap();
+        let tokens = db.get_token_events(input, limit_input).await.unwrap();
         Ok(tokens)
     }
     // token query
-    async fn get_tokens(&self, ctx: &Context<'_>) -> FieldResult<Vec<Erc721>> {
+    async fn get_tokens(&self, ctx: &Context<'_>, limit_input:Pagination) -> FieldResult<Vec<Erc721>> {
         let db = &ctx.data_unchecked::<DBMongo>();
-        let tokens = db.get_erc721_tokens().await.unwrap();
+        let tokens = db.get_erc721_tokens(limit_input).await.unwrap();
         Ok(tokens)
     }
 
@@ -62,9 +62,9 @@ impl Query {
         Ok(token)
     }
 
-    async fn get_user_tokens(&self, ctx: &Context<'_>,input:FetchErc721) -> FieldResult<Vec<Erc721>> {
+    async fn get_user_tokens(&self, ctx: &Context<'_>,input:FetchErc721, limit_input:Pagination) -> FieldResult<Vec<Erc721>> {
         let db = &ctx.data_unchecked::<DBMongo>();
-        let tokens = db.get_user_tokens(input).await.unwrap();
+        let tokens = db.get_user_tokens(input, limit_input).await.unwrap();
         Ok(tokens)
     }
 

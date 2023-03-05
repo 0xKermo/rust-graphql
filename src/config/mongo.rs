@@ -1,9 +1,12 @@
-use crate::graph_schemas::schemas::{CollectionInfo,FetchEvent, Erc721, Events, FetchErc721};
+use crate::graph_schemas::schemas::{
+    CollectionInfo, Erc721, Events, FetchErc721, FetchEvent, Pagination,
+};
 use dotenv::dotenv;
-use futures::TryStreamExt;
+use futures::{TryStreamExt};
 use mongodb::{
-    bson::{doc, from_document},
+    bson::{doc, from_document,},
     Client, Collection, Database,
+    options::FindOptions,
 };
 use std::{env, io::Error};
 
@@ -20,9 +23,7 @@ impl DBMongo {
             Ok(v) => v.to_string(),
             Err(_) => format!("Error loading env variable"),
         };
-        let client = Client::with_uri_str(uri.as_str())
-            .await
-            .unwrap();
+        let client = Client::with_uri_str(uri.as_str()).await.unwrap();
         let db = client.database("moso");
         DBMongo { db }
     }
@@ -31,10 +32,15 @@ impl DBMongo {
         data_source.db.collection(collection_name)
     }
 
-    pub async fn get_collections(&self) -> Result<Vec<CollectionInfo>, Error> {
+    pub async fn get_collections(
+        &self,
+        pagination: Pagination,
+    ) -> Result<Vec<CollectionInfo>, Error> {
         let col = DBMongo::col_helper::<CollectionInfo>(&self, "contracts");
+        let options = FindOptions::builder().skip(pagination.skip.unwrap_or_default()).limit(pagination.limit.unwrap_or_default()).build();
+
         let mut cursors = col
-            .find(None, None)
+            .find(None, options)
             .await
             .expect("Error getting list of collections");
         let mut collections: Vec<CollectionInfo> = Vec::new();
@@ -88,10 +94,11 @@ impl DBMongo {
         Ok(collection)
     }
 
-    pub async fn get_events(&self) -> Result<Vec<Events>, Error> {
+    pub async fn get_events(&self, pagination: Pagination) -> Result<Vec<Events>, Error> {
         let col = DBMongo::col_helper::<Events>(&self, "events");
+        let options = FindOptions::builder().skip(pagination.skip.unwrap_or_default()).limit(pagination.limit.unwrap_or_default()).build();
         let mut cursors = col
-            .find(None, None)
+            .find(None, options)
             .await
             .expect("Error getting list of events");
         let mut events: Vec<Events> = Vec::new();
@@ -108,11 +115,14 @@ impl DBMongo {
     pub async fn get_collection_events(
         &self,
         contract_address: &String,
+        pagination: Pagination,
     ) -> Result<Vec<Events>, Error> {
         let filter = doc! {"contract_address": contract_address.to_string()};
         let col = DBMongo::col_helper::<Events>(&self, "events");
+        let options = FindOptions::builder().skip(pagination.skip.unwrap_or_default()).limit(pagination.limit.unwrap_or_default()).build();
+
         let mut results = col
-            .find(filter, None)
+            .find(filter, options)
             .await
             .expect("Error getting collection events");
         let mut events: Vec<Events> = Vec::new();
@@ -126,12 +136,18 @@ impl DBMongo {
         Ok(events)
     }
 
-    pub async fn get_user_events(&self, owner_address: String) -> Result<Vec<Events>, Error> {
+    pub async fn get_user_events(
+        &self,
+        owner_address: String,
+        pagination: Pagination,
+    ) -> Result<Vec<Events>, Error> {
         let filter =
             doc! {"$or":[{"from": owner_address.to_string()},{"to": owner_address.to_string()}]};
         let col = DBMongo::col_helper::<Events>(&self, "events");
+        let options = FindOptions::builder().skip(pagination.skip.unwrap_or_default()).limit(pagination.limit.unwrap_or_default()).build();
+
         let mut results = col
-            .find(filter, None)
+            .find(filter, options)
             .await
             .expect("Error getting user events");
         let mut events: Vec<Events> = Vec::new();
@@ -144,14 +160,19 @@ impl DBMongo {
         }
         Ok(events)
     }
-    
-    pub async fn get_token_events(&self, input:FetchEvent) -> Result<Vec<Events>, Error> {
+
+    pub async fn get_token_events(
+        &self,
+        input: FetchEvent,
+        pagination: Pagination,
+    ) -> Result<Vec<Events>, Error> {
         let token_id_low = input.token_id.as_ref().unwrap().low.to_string();
         let token_id_high = input.token_id.unwrap().high.to_string();
         let filter = doc! {"contract_address": input.contract_address,"token_id.low": token_id_low,"token_id.high":token_id_high};
         let col = DBMongo::col_helper::<Events>(&self, "events");
+        let options = FindOptions::builder().skip(pagination.skip.unwrap_or_default()).limit(pagination.limit.unwrap_or_default()).build();
         let mut results = col
-            .find(filter, None)
+            .find(filter, options)
             .await
             .expect("Error getting token events");
         let mut events: Vec<Events> = Vec::new();
@@ -165,10 +186,14 @@ impl DBMongo {
         Ok(events)
     }
 
-    pub async fn get_erc721_tokens(&self) -> Result<Vec<Erc721>, Error> {
+    pub async fn get_erc721_tokens(
+        &self,
+        pagination: Pagination,
+    ) -> Result<Vec<Erc721>, Error> {
         let col = DBMongo::col_helper::<Erc721>(&self, "erc721_tokens");
+        let options = FindOptions::builder().skip(pagination.skip.unwrap_or_default()).limit(pagination.limit.unwrap_or_default()).build();
         let mut cursors = col
-            .find(None, None)
+            .find(None, options)
             .await
             .expect("Error getting list of erc721 tokens");
         let mut erc721: Vec<Erc721> = Vec::new();
@@ -183,11 +208,16 @@ impl DBMongo {
         Ok(erc721)
     }
 
-    pub async fn get_user_tokens(&self, input: FetchErc721) -> Result<Vec<Erc721>, Error> {
+    pub async fn get_user_tokens(
+        &self,
+        input: FetchErc721,
+        pagination: Pagination,
+    ) -> Result<Vec<Erc721>, Error> {
         let filter = doc! {"owner": input.owner.unwrap().to_string()};
         let col = DBMongo::col_helper::<Erc721>(&self, "erc721_tokens");
+        let options = FindOptions::builder().skip(pagination.skip.unwrap_or_default()).limit(pagination.limit.unwrap_or_default()).build();
         let mut results = col
-            .find(filter, None)
+            .find(filter, options)
             .await
             .expect("Error getting user tokens");
         let mut erc721: Vec<Erc721> = Vec::new();

@@ -136,3 +136,9 @@ pub struct FetchErc721 {
     pub last_updated: Option<i64>,
     pub metadata: Option<FetchMetadata>,
 }
+
+#[derive(InputObject)]
+pub struct Pagination {
+    pub skip: Option<u64>,
+    pub limit: Option<i64>,
+}
