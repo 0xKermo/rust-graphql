@@ -1,5 +1,5 @@
 use crate::{
-    config::mongo::DBMongo,
+    database::mongo::DBMongo,
     graph_schemas::schemas::{
         FetchEvent,CollectionInfo,Events,Erc721,FetchErc721,FetchCollection, Pagination
     },
@@ -20,7 +20,7 @@ impl Query {
     async fn get_collection(&self, ctx: &Context<'_>,input:FetchCollection) -> FieldResult<CollectionInfo> {
         let db = &ctx.data_unchecked::<DBMongo>();
         let collection = db.get_collection(
-            &input.address.unwrap()).await.unwrap();
+            &input).await.unwrap();
         Ok(collection)
     }
 

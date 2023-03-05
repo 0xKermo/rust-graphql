@@ -1,7 +1,7 @@
-mod config;
+mod database;
 mod graph_handler;
 mod graph_schemas;
-
+mod models;
 //add 
 use actix_web::{
     guard,
@@ -13,7 +13,7 @@ use async_graphql::{
     EmptySubscription, Schema,
 };
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
-use config::mongo::DBMongo;
+use database::mongo::DBMongo;
 use graph_handler::handler::{Mutation, ProjectSchema, Query};
 
 
