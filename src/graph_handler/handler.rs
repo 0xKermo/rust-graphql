@@ -1,6 +1,6 @@
 use crate::{
     config::mongo::DBMongo,
-    schemas::project_schema::{
+    graph_schemas::schemas::{
         FetchEvent,CollectionInfo,Events,Erc721,FetchErc721,FetchCollection
     },
 };
@@ -37,6 +37,18 @@ impl Query {
             &input.contract_address.unwrap()).await.unwrap();
         Ok(collection_events)
     }
+
+    async fn get_user_events(&self, ctx: &Context<'_>,input:FetchEvent) -> FieldResult<Vec<Events>> {
+        let db = &ctx.data_unchecked::<DBMongo>();
+        let tokens = db.get_user_events(input.owner.unwrap()).await.unwrap();
+        Ok(tokens)
+    }
+
+    async fn get_token_events(&self, ctx: &Context<'_>,input:FetchEvent) -> FieldResult<Vec<Events>> {
+        let db = &ctx.data_unchecked::<DBMongo>();
+        let tokens = db.get_token_events(input).await.unwrap();
+        Ok(tokens)
+    }
     // token query
     async fn get_tokens(&self, ctx: &Context<'_>) -> FieldResult<Vec<Erc721>> {
         let db = &ctx.data_unchecked::<DBMongo>();
@@ -56,11 +68,7 @@ impl Query {
         Ok(tokens)
     }
 
-    async fn get_user_events(&self, ctx: &Context<'_>,input:FetchEvent) -> FieldResult<Vec<Events>> {
-        let db = &ctx.data_unchecked::<DBMongo>();
-        let tokens = db.get_user_events(input.owner.unwrap()).await.unwrap();
-        Ok(tokens)
-    }
+   
 
 }
 
@@ -70,7 +78,7 @@ pub struct Mutation;
 impl Mutation {
     //owner mutation
     async fn update_collection(&self, ctx: &Context<'_>, input: FetchEvent) -> FieldResult<Events> {
-        let db = &ctx.data_unchecked::<DBMongo>();
+        // let db = &ctx.data_unchecked::<DBMongo>();
         let new_owner = Events {
             _id: None,
             contract_address:None,

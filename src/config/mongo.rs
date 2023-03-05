@@ -1,4 +1,4 @@
-use crate::schemas::project_schema::{CollectionInfo, Erc721, Events, FetchErc721};
+use crate::graph_schemas::schemas::{CollectionInfo,FetchEvent, Erc721, Events, FetchErc721};
 use dotenv::dotenv;
 use futures::TryStreamExt;
 use mongodb::{
@@ -134,6 +134,26 @@ impl DBMongo {
             .find(filter, None)
             .await
             .expect("Error getting user events");
+        let mut events: Vec<Events> = Vec::new();
+        while let Some(event) = results
+            .try_next()
+            .await
+            .expect("Error mapping through cursor")
+        {
+            events.push(event)
+        }
+        Ok(events)
+    }
+    
+    pub async fn get_token_events(&self, input:FetchEvent) -> Result<Vec<Events>, Error> {
+        let token_id_low = input.token_id.as_ref().unwrap().low.to_string();
+        let token_id_high = input.token_id.unwrap().high.to_string();
+        let filter = doc! {"contract_address": input.contract_address,"token_id.low": token_id_low,"token_id.high":token_id_high};
+        let col = DBMongo::col_helper::<Events>(&self, "events");
+        let mut results = col
+            .find(filter, None)
+            .await
+            .expect("Error getting token events");
         let mut events: Vec<Events> = Vec::new();
         while let Some(event) = results
             .try_next()

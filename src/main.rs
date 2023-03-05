@@ -1,6 +1,6 @@
 mod config;
-mod handler;
-mod schemas;
+mod graph_handler;
+mod graph_schemas;
 
 //add 
 use actix_web::{
@@ -14,7 +14,7 @@ use async_graphql::{
 };
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 use config::mongo::DBMongo;
-use handler::graphql_handler::{Mutation, ProjectSchema, Query};
+use graph_handler::handler::{Mutation, ProjectSchema, Query};
 
 
 //graphql entry
@@ -35,6 +35,7 @@ async fn main() -> std::io::Result<()> {
     let schema_data = Schema::build(Query, Mutation, EmptySubscription)
         .data(db)
         .finish();
+    println!("Playground: http://localhost:8080");
     HttpServer::new(move || {
         App::new()
             .app_data(Data::new(schema_data.clone()))
@@ -46,6 +47,6 @@ async fn main() -> std::io::Result<()> {
                 )
             })
             .bind(("127.0.0.1", 8080))?
-            .run()
+            .run() 
             .await
-}
+        }

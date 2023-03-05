@@ -1,13 +1,12 @@
 use async_graphql::{InputObject, SimpleObject, Enum};
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
-use serde_json::Number;
 
 // Common schema
 #[derive(Debug, Clone, Serialize, Deserialize, SimpleObject,InputObject)]
 pub struct TokenId {
-    low: String,
-    high: String,
+    pub low: String,
+    pub high: String,
 }
 #[derive(InputObject)]
 pub struct FetchTokenId {
@@ -109,7 +108,7 @@ pub struct FetchEvent{
     pub operator: Option<String>,
     pub from: Option<String>,
     pub to: Option<String>,
-    pub token_id: Option<String>,
+    pub token_id: Option<FetchTokenId>,
     pub amount: Option<i64>,
     pub event_type: Option<String>,
     pub contract_type: Option<String>,
