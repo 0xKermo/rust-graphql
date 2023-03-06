@@ -1,4 +1,4 @@
-use async_graphql::{InputObject, SimpleObject, Enum};
+use async_graphql::{InputObject, SimpleObject, Enum,EnumType};
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 
@@ -21,16 +21,16 @@ pub enum DisplayType {
     BoostNumber,
     Date,
 }
-// #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize,Enum)]
+#[derive(Debug, Clone,Copy, PartialEq, Eq, Serialize, Deserialize,Enum)]
 
-// pub enum AttributeValue {
-//     String(String),
-//     Number(Number),
-//     Bool(bool),
-//     StringVec(Vec<String>),
-//     NumberVec(Vec<Number>),
-//     BoolVec(Vec<bool>),
-// }
+pub enum AttributeValue {
+    String,
+    Number,
+    bool,
+    Vec,
+    NumberVec,
+    VecString,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, SimpleObject)]
 pub struct Attributes {
@@ -62,14 +62,24 @@ pub struct FetchMetadata {
 pub struct CollectionInfo {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub address: Option<String>,
-    pub name: Option<String>,
-    pub symbol: Option<String>,
-    pub owner: Option<String>,
-    pub contract_uri: Option<String>,
-    pub base_uri: Option<String>,
+    name: Option<String>,
+    symbol: Option<String>,
+    owner: Option<String>,
+    contract_uri: Option<String>,
+    base_uri: Option<String>,
     pub contract_type: Option<String>,
-    pub volume: Option<String>,
-    pub total_supply: Option<i32>,
+    
+    creator_fee: Option<i32>,
+    total_listed: Option<i32>,
+    volume: Option<String>,
+    total_supply: Option<i32>,
+    total_owners: Option<i32>,
+    unique_owners: Option<i32>,
+    floor_price: Option<i32>,
+
+    best_collection_offer: Option<i32>,
+
+
 }
 
 // Filter for collection query
@@ -115,16 +125,29 @@ pub struct FetchEvent{
     pub owner: Option<String>,
 }
 
+
+#[derive(Enum, Copy, Clone, Debug,Eq,PartialEq, Serialize, Deserialize)]
+pub enum Status {
+    Listed,
+    Sold,
+    Cancelled,
+}
+
 // erc721 schema
 #[derive(Debug, Clone, Serialize, Deserialize, SimpleObject)]
 pub struct Erc721 {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub _id: Option<ObjectId>,
-    pub contract_address: Option<String>,
-    pub token_id: Option<TokenId>,
-    pub owner: Option<String>,
-    pub last_updated: Option<i64>,
-    pub metadata: Option<Metadata>,
+    contract_address: Option<String>,
+    token_id: Option<TokenId>,
+    owner: Option<String>,
+    last_updated: Option<i64>,
+    metadata: Option<Metadata>,
+    price: Option<i64>,
+    
+    best_offer: Option<i64>,
+    best_offer_expires_at: Option<i64>,
+    status: Option<Status>,
 }
 
 #[derive(InputObject)]

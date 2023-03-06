@@ -1,19 +1,19 @@
-use mongodb::{
-    bson::{doc},
-    options::FindOptions, Collection,
-};
-use crate::graph_schemas::schemas::{
-    Events,FetchEvent, Pagination,
-};use std::{io::Error};
+use crate::graph_schemas::schemas::{Events, FetchEvent, Pagination};
 use futures::TryStreamExt;
+use mongodb::{bson::doc, options::FindOptions, Collection};
+use std::io::Error;
 
-
-
-pub struct EventModel{}
+pub struct EventModel {}
 
 impl EventModel {
-    pub async fn get_events(col: Collection<Events>, pagination: Pagination) -> Result<Vec<Events>, Error> {
-        let options = FindOptions::builder().skip(pagination.skip.unwrap_or_default()).limit(pagination.limit.unwrap_or_default()).build();
+    pub async fn get_events(
+        col: Collection<Events>,
+        pagination: Pagination,
+    ) -> Result<Vec<Events>, Error> {
+        let options = FindOptions::builder()
+            .skip(pagination.skip.unwrap_or_default())
+            .limit(pagination.limit.unwrap_or_default())
+            .build();
         let mut cursors = col
             .find(None, options)
             .await
@@ -35,7 +35,10 @@ impl EventModel {
         pagination: Pagination,
     ) -> Result<Vec<Events>, Error> {
         let filter = doc! {"contract_address": contract_address.to_string()};
-        let options = FindOptions::builder().skip(pagination.skip.unwrap_or_default()).limit(pagination.limit.unwrap_or_default()).build();
+        let options = FindOptions::builder()
+            .skip(pagination.skip.unwrap_or_default())
+            .limit(pagination.limit.unwrap_or_default())
+            .build();
 
         let mut results = col
             .find(filter, options)
@@ -59,7 +62,10 @@ impl EventModel {
     ) -> Result<Vec<Events>, Error> {
         let filter =
             doc! {"$or":[{"from": owner_address.to_string()},{"to": owner_address.to_string()}]};
-        let options = FindOptions::builder().skip(pagination.skip.unwrap_or_default()).limit(pagination.limit.unwrap_or_default()).build();
+        let options = FindOptions::builder()
+            .skip(pagination.skip.unwrap_or_default())
+            .limit(pagination.limit.unwrap_or_default())
+            .build();
 
         let mut results = col
             .find(filter, options)
@@ -84,7 +90,10 @@ impl EventModel {
         let token_id_low = input.token_id.as_ref().unwrap().low.to_string();
         let token_id_high = input.token_id.unwrap().high.to_string();
         let filter = doc! {"contract_address": input.contract_address,"token_id.low": token_id_low,"token_id.high":token_id_high};
-        let options = FindOptions::builder().skip(pagination.skip.unwrap_or_default()).limit(pagination.limit.unwrap_or_default()).build();
+        let options = FindOptions::builder()
+            .skip(pagination.skip.unwrap_or_default())
+            .limit(pagination.limit.unwrap_or_default())
+            .build();
         let mut results = col
             .find(filter, options)
             .await
@@ -99,5 +108,4 @@ impl EventModel {
         }
         Ok(events)
     }
-
 }

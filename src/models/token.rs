@@ -6,7 +6,10 @@ use std::io::Error;
 pub struct TokenModel {}
 
 impl TokenModel {
-    pub async fn get_erc721_tokens(col:Collection<Erc721>, pagination: Pagination) -> Result<Vec<Erc721>, Error> {
+    pub async fn get_erc721_tokens(
+        col: Collection<Erc721>,
+        pagination: Pagination,
+    ) -> Result<Vec<Erc721>, Error> {
         let options = FindOptions::builder()
             .skip(pagination.skip.unwrap_or_default())
             .limit(pagination.limit.unwrap_or_default())

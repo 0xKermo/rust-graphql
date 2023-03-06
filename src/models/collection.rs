@@ -1,16 +1,16 @@
+use crate::graph_schemas::schemas::{CollectionInfo, FetchCollection, Pagination};
+use futures::TryStreamExt;
 use mongodb::{
     bson::{doc, from_document},
-    options::FindOptions, Collection,
+    options::FindOptions,
+    Collection,
 };
-use crate::graph_schemas::schemas::{
-    CollectionInfo,FetchCollection, Pagination,
-};use std::{io::Error};
-use futures::TryStreamExt;
+use std::io::Error;
 pub struct CollectionModel {}
 
 impl CollectionModel {
     pub async fn get_collections(
-        collection : Collection<CollectionInfo>,
+        collection: Collection<CollectionInfo>,
         pagination: Pagination,
     ) -> Result<Vec<CollectionInfo>, Error> {
         let options = FindOptions::builder()
@@ -33,7 +33,10 @@ impl CollectionModel {
         Ok(collections)
     }
 
-    pub async fn get_collection(collection : Collection<CollectionInfo>, input: &FetchCollection) -> Result<CollectionInfo, Error> {
+    pub async fn get_collection(
+        collection: Collection<CollectionInfo>,
+        input: &FetchCollection,
+    ) -> Result<CollectionInfo, Error> {
         let contract_address = input.address.as_ref().unwrap().to_string();
         let filter = doc! {"address": contract_address};
         let pipeline = vec![
@@ -67,5 +70,4 @@ impl CollectionModel {
         let collection: CollectionInfo = from_document(res).unwrap();
         Ok(collection)
     }
-    
 }
