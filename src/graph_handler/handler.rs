@@ -1,7 +1,7 @@
 use crate::{
     database::mongo::DBMongo,
     graph_schemas::schemas::{
-        FetchEvent,CollectionInfo,Events,Erc721,FetchErc721,FetchCollection, Pagination
+        FetchEvent,CollectionInfo,Events,Erc721Token,FilterErc721Token,FetchCollection, Pagination
     },
 };
 use async_graphql::{Context, EmptySubscription, FieldResult, Object, Schema};
@@ -50,25 +50,23 @@ impl Query {
         Ok(tokens)
     }
     // token query
-    async fn get_tokens(&self, ctx: &Context<'_>, limit_input:Pagination) -> FieldResult<Vec<Erc721>> {
+    async fn get_tokens(&self, ctx: &Context<'_>, limit_input:Pagination) -> FieldResult<Vec<Erc721Token>> {
         let db = &ctx.data_unchecked::<DBMongo>();
         let tokens = db.get_erc721_tokens(limit_input).await.unwrap();
         Ok(tokens)
     }
 
-    async fn get_token(&self, ctx: &Context<'_>,input:FetchErc721) -> FieldResult<Erc721> {
+    async fn get_token(&self, ctx: &Context<'_>,input:FilterErc721Token) -> FieldResult<Erc721Token> {
         let db = &ctx.data_unchecked::<DBMongo>();
         let token = db.get_token(input).await.unwrap();
         Ok(token)
     }
 
-    async fn get_user_tokens(&self, ctx: &Context<'_>,input:FetchErc721, limit_input:Pagination) -> FieldResult<Vec<Erc721>> {
+    async fn get_user_tokens(&self, ctx: &Context<'_>,input:FilterErc721Token, limit_input:Pagination) -> FieldResult<Vec<Erc721Token>> {
         let db = &ctx.data_unchecked::<DBMongo>();
         let tokens = db.get_user_tokens(input, limit_input).await.unwrap();
         Ok(tokens)
     }
-
-   
 
 }
 
@@ -77,7 +75,7 @@ pub struct Mutation;
 #[Object]
 impl Mutation {
     //owner mutation
-    async fn update_collection(&self, ctx: &Context<'_>, input: FetchEvent) -> FieldResult<Events> {
+    async fn update_collectionProfile(&self, ctx: &Context<'_>, input: FetchEvent) -> FieldResult<Events> {
         // let db = &ctx.data_unchecked::<DBMongo>();
         let new_owner = Events {
             _id: None,

@@ -1,5 +1,5 @@
 use crate::graph_schemas::schemas::{
-    CollectionInfo, Erc721, Events, FetchErc721,FetchCollection, FetchEvent, Pagination,
+    CollectionInfo, Erc721Token, Events, FilterErc721Token,FetchCollection, FetchEvent, Pagination,
 };
 use dotenv::dotenv;
 use mongodb::{
@@ -84,22 +84,22 @@ impl DBMongo {
     pub async fn get_erc721_tokens(
         &self,
         pagination: Pagination,
-    ) -> Result<Vec<Erc721>, Error> {
-        let col = DBMongo::col_helper::<Erc721>(&self, "erc721_tokens");
+    ) -> Result<Vec<Erc721Token>, Error> {
+        let col = DBMongo::col_helper::<Erc721Token>(&self, "erc721_tokens");
         TokenModel::get_erc721_tokens(col, pagination).await
     }
 
     pub async fn get_user_tokens(
         &self,
-        input: FetchErc721,
+        input: FilterErc721Token,
         pagination: Pagination,
-    ) -> Result<Vec<Erc721>, Error> {
-        let col = DBMongo::col_helper::<Erc721>(&self, "erc721_tokens");
+    ) -> Result<Vec<Erc721Token>, Error> {
+        let col = DBMongo::col_helper::<Erc721Token>(&self, "erc721_tokens");
         TokenModel::get_user_tokens(col, input, pagination).await
     }
 
-    pub async fn get_token(&self, input: FetchErc721) -> Result<Erc721, Error> {
-        let col = DBMongo::col_helper::<Erc721>(&self, "erc721_tokens");
+    pub async fn get_token(&self, input: FilterErc721Token) -> Result<Erc721Token, Error> {
+        let col = DBMongo::col_helper::<Erc721Token>(&self, "erc721_tokens");
         TokenModel::get_token(col, input).await
     }
 }

@@ -70,15 +70,18 @@ pub struct CollectionInfo {
     pub contract_type: Option<String>,
     
     creator_fee: Option<i32>,
+    creator_fee_recipient: Option<String>,
     total_listed: Option<i32>,
     volume: Option<String>,
     total_supply: Option<i32>,
     total_owners: Option<i32>,
     unique_owners: Option<i32>,
-    floor_price: Option<i32>,
 
     best_collection_offer: Option<i32>,
 
+    floor_price: Option<i32>,
+    volume_one_day: Option<i32>,
+    volume_one_week: Option<i32>,
 
 }
 
@@ -125,7 +128,6 @@ pub struct FetchEvent{
     pub owner: Option<String>,
 }
 
-
 #[derive(Enum, Copy, Clone, Debug,Eq,PartialEq, Serialize, Deserialize)]
 pub enum Status {
     Listed,
@@ -135,7 +137,7 @@ pub enum Status {
 
 // erc721 schema
 #[derive(Debug, Clone, Serialize, Deserialize, SimpleObject)]
-pub struct Erc721 {
+pub struct Erc721Token {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub _id: Option<ObjectId>,
     contract_address: Option<String>,
@@ -143,15 +145,16 @@ pub struct Erc721 {
     owner: Option<String>,
     last_updated: Option<i64>,
     metadata: Option<Metadata>,
+
     price: Option<i64>,
-    
+    last_sale_price: Option<i64>,
     best_offer: Option<i64>,
     best_offer_expires_at: Option<i64>,
     status: Option<Status>,
 }
 
 #[derive(InputObject)]
-pub struct FetchErc721 {
+pub struct FilterErc721Token {
     pub _id: Option<ObjectId>,
     pub contract_address: Option<String>,
     pub token_id: Option<FetchTokenId>,
@@ -160,8 +163,57 @@ pub struct FetchErc721 {
     pub metadata: Option<FetchMetadata>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, SimpleObject)]
+pub struct Erc1155Token {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    contract_address: Option<String>,
+    token_id: Option<TokenId>,
+    owner: Option<String>,
+    balance: Option<i64>,
+    last_updated: Option<i64>,
+    metadata: Option<Metadata>,
+
+    price: Option<i64>,
+    last_sale_price: Option<i64>,
+    best_offer: Option<i64>,
+    best_offer_expires_at: Option<i64>,
+    status: Option<Status>,
+}
+
 #[derive(InputObject)]
 pub struct Pagination {
     pub skip: Option<u64>,
     pub limit: Option<i64>,
+}
+
+
+// User profile schema
+#[derive(Debug, Clone, Serialize, Deserialize, SimpleObject)]
+pub struct UserProfile {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    wallet_address: Option<String>,
+    username: Option<String>,
+    profile_image_url: Option<String>,
+    banner_image_url: Option<String>,
+    bio: Option<String>,
+    social: Option<Social>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, SimpleObject)]
+pub struct Social {
+    web_site: Option<String>,
+    twitter: Option<String>,
+    discord: Option<String>,
+}
+
+// User profile schema
+#[derive(Debug, Clone, Serialize, Deserialize, SimpleObject)]
+pub struct CollectionProfile {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    contract_address: Option<String>,
+    owner: Option<String>,
+    profile_image_url: Option<String>,
+    banner_image_url: Option<String>,
+    bio: Option<String>,
+    social: Option<Social>,
 }
