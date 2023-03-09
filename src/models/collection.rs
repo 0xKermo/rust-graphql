@@ -1,4 +1,4 @@
-use crate::graph_schemas::schemas::{CollectionInfo, FetchCollection, Pagination};
+use crate::graph_schemas::schemas::{CollectionInfo, FetchCollection, Pagination,CollectionProfile};
 use futures::TryStreamExt;
 use mongodb::{
     bson::{doc, from_document},
@@ -6,7 +6,7 @@ use mongodb::{
     Collection,
 };
 use std::io::Error;
-pub struct CollectionModel {}
+pub struct CollectionModel;
 
 impl CollectionModel {
     pub async fn get_collections(
@@ -69,5 +69,15 @@ impl CollectionModel {
         println!("res {:?}", res);
         let collection: CollectionInfo = from_document(res).unwrap();
         Ok(collection)
+    }
+
+    pub async fn get_collection_profile(col: Collection<CollectionProfile>, input: &FetchCollection) -> Result<CollectionProfile, Error> {
+        let contract_address = input.address.as_ref().unwrap().to_string();
+        let filter = doc! {"address": contract_address};
+        let result = col
+            .find_one(filter, None)
+            .await
+            .expect("Error getting token").unwrap();
+        Ok(result)
     }
 }

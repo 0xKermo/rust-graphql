@@ -3,7 +3,7 @@ use futures::TryStreamExt;
 use mongodb::{bson::doc, options::FindOptions, Collection};
 use std::io::Error;
 
-pub struct EventModel {}
+pub struct EventModel;
 
 impl EventModel {
     pub async fn get_events(

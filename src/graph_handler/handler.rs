@@ -1,7 +1,7 @@
 use crate::{
     database::mongo::DBMongo,
     graph_schemas::schemas::{
-        FetchEvent,CollectionInfo,Events,Erc721Token,FilterErc721Token,FetchCollection, Pagination
+        FetchEvent,CollectionInfo,Events,Erc721Token,FilterErc721Token,FetchCollection, Pagination, UserProfile
     },
 };
 use async_graphql::{Context, EmptySubscription, FieldResult, Object, Schema};
@@ -68,6 +68,11 @@ impl Query {
         Ok(tokens)
     }
 
+    async fn get_user_profile(&self, ctx: &Context<'_>,input:FetchCollection) -> FieldResult<UserProfile> {
+        let db = &ctx.data_unchecked::<DBMongo>();
+        let user_profile = db.get_user_profile(input).await.unwrap();
+        Ok(user_profile)
+    }
 }
 
 pub struct Mutation;

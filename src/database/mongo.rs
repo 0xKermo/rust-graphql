@@ -1,17 +1,17 @@
 use crate::graph_schemas::schemas::{
-    CollectionInfo, Erc721Token, Events, FilterErc721Token,FetchCollection, FetchEvent, Pagination,
+    CollectionInfo, Erc721Token, Events, FilterErc721Token,CollectionProfile,FetchCollection, FetchEvent, Pagination, UserProfile,
 };
 use dotenv::dotenv;
 use mongodb::{
     Client, Collection, Database,
 };
-use async_graphql::{Context};
 
 use std::{env, io::Error};
 use crate::models::{
     collection::CollectionModel,
     event::EventModel,
-    token::TokenModel
+    token::TokenModel,
+    user_profile::UserModel
 };
 
 //imports goes here
@@ -46,6 +46,14 @@ impl DBMongo {
     pub async fn get_collection(&self, input: &FetchCollection) -> Result<CollectionInfo, Error> {
         let col = DBMongo::col_helper::<CollectionInfo>(&self, "contracts");
         CollectionModel::get_collection(col, input).await
+    }
+
+    pub async fn get_collection_profile(
+        &self,
+        input: &FetchCollection,
+    ) -> Result<CollectionProfile, Error> {
+        let col = DBMongo::col_helper::<CollectionProfile>(&self, "collection_profile");
+        CollectionModel::get_collection_profile(col, input).await
     }
 
     pub async fn get_events(&self, pagination: Pagination) -> Result<Vec<Events>, Error> {
@@ -102,4 +110,10 @@ impl DBMongo {
         let col = DBMongo::col_helper::<Erc721Token>(&self, "erc721_tokens");
         TokenModel::get_token(col, input).await
     }
+
+    pub async fn get_user_profile(&self, input: FetchCollection) -> Result<UserProfile, Error> {
+        let col = DBMongo::col_helper::<UserProfile>(&self, "user_profile");
+        UserModel::get_user_profile(col, input).await
+    }
+
 }

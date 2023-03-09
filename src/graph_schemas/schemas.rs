@@ -191,7 +191,7 @@ pub struct Pagination {
 #[derive(Debug, Clone, Serialize, Deserialize, SimpleObject)]
 pub struct UserProfile {
     #[serde(skip_serializing_if = "Option::is_none")]
-    wallet_address: Option<String>,
+    pub wallet_address: Option<String>,
     username: Option<String>,
     profile_image_url: Option<String>,
     banner_image_url: Option<String>,
