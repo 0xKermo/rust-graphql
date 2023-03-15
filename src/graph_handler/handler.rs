@@ -1,7 +1,7 @@
 use crate::{
     database::mongo::DBMongo,
     graph_schemas::schemas::{
-        FetchEvent,CollectionInfo,Events,Erc721Token,FilterErc721Token,FetchCollection, Pagination, UserProfile
+        FetchEvent,CollectionInfo,Events,Erc721Token,FilterErc721Token,CollectionProfile,FetchCollection, Pagination, UserProfile
     },
 };
 use async_graphql::{Context, EmptySubscription, FieldResult, Object, Schema};
@@ -20,6 +20,12 @@ impl Query {
     async fn get_collection(&self, ctx: &Context<'_>,input:FetchCollection) -> FieldResult<CollectionInfo> {
         let db = &ctx.data_unchecked::<DBMongo>();
         let collection = db.get_collection(
+            &input).await.unwrap();
+        Ok(collection)
+    }
+    async fn get_collection_profile(&self, ctx: &Context<'_>,input:FetchCollection) -> FieldResult<CollectionProfile> {
+        let db = &ctx.data_unchecked::<DBMongo>();
+        let collection = db.get_collection_profile(
             &input).await.unwrap();
         Ok(collection)
     }
@@ -80,43 +86,13 @@ pub struct Mutation;
 #[Object]
 impl Mutation {
     //owner mutation
-    async fn update_collectionProfile(&self, ctx: &Context<'_>, input: FetchEvent) -> FieldResult<Events> {
-        // let db = &ctx.data_unchecked::<DBMongo>();
-        let new_owner = Events {
-            _id: None,
-            contract_address:None,
-            operator:None,
-            from:None,
-            to:None,
-            amount:None,
-            token_id    :None,
-            block_number:None,
-            transaction_hash:None,
-            event_type:None,
-            contract_type  :None,
-
-            
-        };
-        // let owner = db.create_owner(new_owner).await.unwrap();
-        Ok(new_owner)
+    async fn update_collection_profile(&self, ctx: &Context<'_>, input: CollectionProfile) -> FieldResult<CollectionProfile> {
+        let db = &ctx.data_unchecked::<DBMongo>();
+        let collection_profile = db.update_collection_profile(&input).await.unwrap();
+        Ok(collection_profile)
     }
 
-    // async fn create_project(
-    //     &self,
-    //     ctx: &Context<'_>,
-    //     input: CreateProject,
-    // ) -> FieldResult<Project> {
-    //     let db = &ctx.data_unchecked::<DBMongo>();
-    //     let new_project = Project {
-    //         _id: None,
-    //         owner_id: input.owner_id,
-    //         name: input.name,
-    //         description: input.description,
-    //         status: input.status,
-    //     };
-    //     let project = db.create_project(new_project).await.unwrap();
-    //     Ok(project)
-    // }
+
 }
 
 pub type ProjectSchema = Schema<Query, Mutation, EmptySubscription>;

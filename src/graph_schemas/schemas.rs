@@ -199,21 +199,23 @@ pub struct UserProfile {
     social: Option<Social>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, SimpleObject)]
+#[derive(Debug, Clone, Serialize, Deserialize, SimpleObject, InputObject)]
 pub struct Social {
-    web_site: Option<String>,
-    twitter: Option<String>,
-    discord: Option<String>,
+    pub web_site: Option<String>,
+    pub twitter: Option<String>,
+    pub discord: Option<String>,
 }
 
 // User profile schema
-#[derive(Debug, Clone, Serialize, Deserialize, SimpleObject)]
+#[derive(Debug, Clone, Serialize, Deserialize, SimpleObject, InputObject)]
 pub struct CollectionProfile {
     #[serde(skip_serializing_if = "Option::is_none")]
-    contract_address: Option<String>,
-    owner: Option<String>,
-    profile_image_url: Option<String>,
-    banner_image_url: Option<String>,
-    bio: Option<String>,
-    social: Option<Social>,
+    pub contract_address: Option<String>,
+    pub owner: Option<String>,
+    pub profile_image_url: Option<String>,
+    pub banner_image_url: Option<String>,
+    pub bio: Option<String>,
+    pub social: Option<Social>,
+    sig_r: Option<String>,
+    sig_v: Option<String>,
 }

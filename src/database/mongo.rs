@@ -116,4 +116,20 @@ impl DBMongo {
         UserModel::get_user_profile(col, input).await
     }
 
+    // POST
+
+
+
+
+    // PUT
+
+    pub async fn update_collection_profile(
+        &self,
+        input: &CollectionProfile,
+    ) -> Result<CollectionProfile, Error> {
+        let col = DBMongo::col_helper::<CollectionProfile>(&self, "collection_profile");
+        CollectionModel::update_collection_profile(col, input).await
+    }
+
+
 }
