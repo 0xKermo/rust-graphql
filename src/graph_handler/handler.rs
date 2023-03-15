@@ -85,13 +85,18 @@ pub struct Mutation;
 
 #[Object]
 impl Mutation {
-    //owner mutation
+    //collection mutation
     async fn update_collection_profile(&self, ctx: &Context<'_>, input: CollectionProfile) -> FieldResult<CollectionProfile> {
         let db = &ctx.data_unchecked::<DBMongo>();
-        let collection_profile = db.update_collection_profile(&input).await.unwrap();
+        let collection_profile = db.update_collection_profile(input).await.unwrap();
         Ok(collection_profile)
     }
-
+    // user mutation
+    async fn update_user_profile(&self, ctx: &Context<'_>, input: UserProfile) -> FieldResult<UserProfile> {
+        let db = &ctx.data_unchecked::<DBMongo>();
+        let user_profile = db.update_user_profile(input).await.unwrap();
+        Ok(user_profile)
+    }
 
 }
 

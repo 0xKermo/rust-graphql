@@ -125,10 +125,18 @@ impl DBMongo {
 
     pub async fn update_collection_profile(
         &self,
-        input: &CollectionProfile,
+        input: CollectionProfile,
     ) -> Result<CollectionProfile, Error> {
         let col = DBMongo::col_helper::<CollectionProfile>(&self, "collection_profile");
         CollectionModel::update_collection_profile(col, input).await
+    }
+
+    pub async fn update_user_profile(
+        &self,
+        input: UserProfile,
+    ) -> Result<UserProfile, Error> {
+        let col = DBMongo::col_helper::<UserProfile>(&self, "user_profile");
+        UserModel::update_user_profile(col, input).await
     }
 
 

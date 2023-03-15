@@ -81,18 +81,18 @@ impl CollectionModel {
         Ok(result)
     }
 
-    pub async fn update_collection_profile(col: Collection<CollectionProfile>, input: &CollectionProfile) -> Result<CollectionProfile, Error>{
-        let contract_address = input.contract_address.as_ref().unwrap().to_string();
+    pub async fn update_collection_profile(col: Collection<CollectionProfile>, input: CollectionProfile) -> Result<CollectionProfile, Error>{
+        let contract_address = input.contract_address;
         let filter = doc! {"address": contract_address};
         let update = doc! {
             "$set": {
-                "profile_image_url": input.profile_image_url.as_ref().unwrap().to_string(),
-                "banner_image_url": input.banner_image_url.as_ref().unwrap().to_string(),
-                "bio": input.bio.as_ref().unwrap().to_string(),
+                "profile_image_url": input.profile_image_url,
+                "banner_image_url": input.banner_image_url,
+                "bio": input.bio,
                 "social":{
-                    "website": input.social.as_ref().unwrap().web_site.as_ref().unwrap().to_string(),
-                    "twitter": input.social.as_ref().unwrap().twitter.as_ref().unwrap().to_string(),
-                    "discord": input.social.as_ref().unwrap().discord.as_ref().unwrap().to_string(),
+                    "website": input.social.as_ref().unwrap().web_site.as_ref(),
+                    "twitter": input.social.as_ref().unwrap().twitter.as_ref(),
+                    "discord": input.social.as_ref().unwrap().discord.as_ref(),
                 },
                 },
             };

@@ -188,15 +188,17 @@ pub struct Pagination {
 
 
 // User profile schema
-#[derive(Debug, Clone, Serialize, Deserialize, SimpleObject)]
+#[derive(Debug, Clone, Serialize, Deserialize, SimpleObject, InputObject)]
 pub struct UserProfile {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub wallet_address: Option<String>,
-    username: Option<String>,
-    profile_image_url: Option<String>,
-    banner_image_url: Option<String>,
-    bio: Option<String>,
-    social: Option<Social>,
+    pub username: Option<String>,
+    pub profile_image_url: Option<String>,
+    pub banner_image_url: Option<String>,
+    pub bio: Option<String>,
+    pub social: Option<Social>,
+    sig_r: Option<String>,
+    sig_v: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, SimpleObject, InputObject)]
